@@ -6,9 +6,11 @@ using System.Collections.Generic;
 
 namespace Daishi.AMQP {
     internal class RabbitMQConsumerCatchOne : RabbitMQConsumer {
-        public RabbitMQConsumerCatchOne(string queueName, int timeout, ushort prefetchCount = 1, bool noAck = false,
-            bool createQueue = true, bool implicitAck = true, IDictionary<string, object> queueArgs = null) :
-                base(queueName, timeout, prefetchCount, noAck, createQueue, implicitAck, queueArgs) {}
+        public RabbitMQConsumerCatchOne(string queueName, int timeout,  ushort prefetchCount = 1, bool noAck = false,
+            bool connectBinding = false, string exchangeName = "", string routingKeyName = "",
+            bool createQueue = true, bool durable = true, bool exclusive = false, bool autoDelete = false, 
+            bool implicitAck = true, IDictionary<string, object> queueArgs = null) :
+                base(queueName, timeout, prefetchCount, noAck, connectBinding, exchangeName, routingKeyName, createQueue, durable, exclusive, autoDelete, implicitAck, queueArgs) { }
 
         public override void Start(AMQPAdapter amqpAdapter) {
             base.Start(amqpAdapter);

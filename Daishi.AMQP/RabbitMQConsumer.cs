@@ -11,8 +11,10 @@ using RabbitMQ.Client.Events;
 namespace Daishi.AMQP {
     public abstract class RabbitMQConsumer : AMQPConsumer {
         protected RabbitMQConsumer(string queueName, int timeout, ushort prefetchCount = 1, bool noAck = false,
-            bool createQueue = true, bool implicitAck = true, IDictionary<string, object> queueArgs = null)
-            : base(queueName, timeout, prefetchCount, noAck, createQueue, implicitAck, queueArgs) {}
+            bool connectBinding  = false, string exchangeName = "", string routingKeyName = "",
+            bool createQueue = true, bool durable = true, bool exclusive = false, bool autoDelete = false, 
+            bool implicitAck = true, IDictionary<string, object> queueArgs = null)
+            : base(queueName, timeout, prefetchCount, noAck, connectBinding, exchangeName, routingKeyName, createQueue, durable, exclusive, autoDelete, implicitAck, queueArgs) { }
 
         protected void Start(AMQPAdapter amqpAdapter, bool catchAllExceptions) {
             base.Start(amqpAdapter);
@@ -20,7 +22,8 @@ namespace Daishi.AMQP {
                 var connection = (IConnection) amqpAdapter.GetConnection();
 
                 using (var channel = connection.CreateModel()) {
-                    if (createQueue) channel.QueueDeclare(queueName, true, false, false, queueArgs);
+                    if (createQueue) channel.QueueDeclare(queueName, durable, exclusive, autoDelete, queueArgs);
+                    if (connectBinding) channel.QueueBind(queueName, exchangeName, routingKeyName);
                     channel.BasicQos(0, prefetchCount, false);
 
                     var consumer = new QueueingBasicConsumer(channel);
