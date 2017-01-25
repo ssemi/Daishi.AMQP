@@ -62,6 +62,8 @@
     <Compile Include="AMQPQueueMetricsAnalysedEventArgs.cs" />
     <Compile Include="AMQPQueueMetricsAnalyser.cs" />
     <Compile Include="AMQPQueueMetricsManager.cs" />
+    <Compile Include="Base64Decoder.cs" />
+    <Compile Include="Base64Encoder.cs" />
     <Compile Include="ConsumerUtilisationParser.cs" />
     <Compile Include="ConsumerUtilisationTooLowAMQPQueueMetricAnalyser.cs" />
     <Compile Include="ConsumptionRateDecreasedAMQPQueueMetricAnalyser.cs" />
@@ -76,6 +78,7 @@
     <Compile Include="QueueWatch.cs" />
     <Compile Include="RabbitMQAdapter.cs" />
     <Compile Include="RabbitMQAuthorizationHeader.cs" />
+    <Compile Include="RabbitMQConsumers.cs" />
     <Compile Include="RabbitMQConsumer.cs" />
     <Compile Include="RabbitMQConsumerCatchAll.cs" />
     <Compile Include="RabbitMQConsumerCatchOne.cs" />

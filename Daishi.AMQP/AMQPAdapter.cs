@@ -39,6 +39,7 @@ namespace Daishi.AMQP {
 
         public abstract void AcknowledgeMessage(ulong deliveryTag);
 
+        public abstract IList<RabbitMQConsumers> GetConsumers();
         public void ConsumeAsync(AMQPConsumer consumer) {
             if (!IsConnected) Connect();
 

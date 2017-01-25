@@ -1,9 +1,12 @@
 ﻿#region Includes
 
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System;
 
 #endregion
 
@@ -114,6 +117,23 @@ namespace Daishi.AMQP {
             if (!IsConnected) Connect();
             using (var channel = _connection.CreateModel())
                 channel.BasicAck(deliveryTag, false);
+        }
+
+        public override IList<RabbitMQConsumers> GetConsumers()
+        {
+            if (!IsConnected) Connect();
+
+            var authorizationParameter = String.Join(":", this.userName, this.password);
+            var base64EncodedString = Base64Encoder.GetBase64Encoded(authorizationParameter);
+
+            using (var wc = new WebClient())
+            {
+                wc.Headers.Add("Authorization", String.Format("Basic {0}", base64EncodedString));
+                var str = wc.DownloadString(String.Format("{1}://{0}:15672/api/consumers", this.hostName, this.hostName.Contains("https") ? "https" : "http"));
+                if (!String.IsNullOrEmpty(str))
+                    return JsonConvert.DeserializeObject<List<RabbitMQConsumers>>(str);
+            }
+            return null;
         }
     }
 }
