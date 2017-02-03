@@ -119,7 +119,7 @@ namespace Daishi.AMQP {
                 channel.BasicAck(deliveryTag, false);
         }
 
-        public override IList<RabbitMQConsumers> GetConsumers()
+        public override T GetApi<T>(string path)
         {
             if (!IsConnected) Connect();
 
@@ -129,11 +129,11 @@ namespace Daishi.AMQP {
             using (var wc = new WebClient())
             {
                 wc.Headers.Add("Authorization", String.Format("Basic {0}", base64EncodedString));
-                var str = wc.DownloadString(String.Format("{1}://{0}:15672/api/consumers", this.hostName, this.hostName.Contains("https") ? "https" : "http"));
+                var str = wc.DownloadString(String.Format("{1}://{0}:15672/api/{2}", this.hostName, this.hostName.Contains("https") ? "https" : "http", path));
                 if (!String.IsNullOrEmpty(str))
-                    return JsonConvert.DeserializeObject<List<RabbitMQConsumers>>(str);
+                    return JsonConvert.DeserializeObject<T>(str);
             }
-            return null;
+            return (T)Convert.ChangeType(null, typeof(T));
         }
     }
 }
