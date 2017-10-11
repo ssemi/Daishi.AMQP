@@ -7,6 +7,9 @@ using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 #endregion
 
@@ -129,7 +132,26 @@ namespace Daishi.AMQP {
             using (var wc = new WebClient())
             {
                 wc.Headers.Add("Authorization", String.Format("Basic {0}", base64EncodedString));
-                var str = wc.DownloadString(String.Format("{1}://{0}:15672/api/{2}", this.hostName, this.hostName.Contains("https") ? "https" : "http", path));
+                var uri = String.Format("{1}://{0}:15672/api/{2}", this.hostName, this.hostName.StartsWith("https") ? "https" : "http", path);
+                var str = wc.DownloadString(uri);
+                if (!String.IsNullOrEmpty(str))
+                    return JsonConvert.DeserializeObject<T>(str);
+            }
+            return (T)Convert.ChangeType(null, typeof(T));
+        }
+
+        public async override Task<T> GetApiAsync<T>(string path)
+        {
+            if (!IsConnected) Connect();
+
+            var authorizationParameter = String.Join(":", this.userName, this.password);
+            var base64EncodedString = Base64Encoder.GetBase64Encoded(authorizationParameter);
+
+            using (var client = new HttpClient())
+            {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", base64EncodedString);
+                var uri = String.Format("{1}://{0}:15672/api/{2}", this.hostName, this.hostName.StartsWith("https") ? "https" : "http", path);
+                var str = await client.GetStringAsync(uri);
                 if (!String.IsNullOrEmpty(str))
                     return JsonConvert.DeserializeObject<T>(str);
             }

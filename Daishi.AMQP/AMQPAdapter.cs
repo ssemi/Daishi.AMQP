@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Threading.Tasks;
 
 #endregion
 
@@ -40,6 +41,7 @@ namespace Daishi.AMQP {
         public abstract void AcknowledgeMessage(ulong deliveryTag);
 
         public abstract T GetApi<T>(string path);
+        public abstract Task<T> GetApiAsync<T>(string path);
 
         public void ConsumeAsync(AMQPConsumer consumer) {
             if (!IsConnected) Connect();
